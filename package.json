@@ -1,0 +1,21 @@
+{
+  "name": "uptime-monitoring",
+  "version": "1.0.0",
+  "description": "uptime monitoring project made by palak banik",
+  "homepage": "https://github.com/palakbanik/uptime_monitoring_by_raw_nodejs#readme",
+  "bugs": {
+    "url": "https://github.com/palakbanik/uptime_monitoring_by_raw_nodejs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/palakbanik/uptime_monitoring_by_raw_nodejs.git"
+  },
+  "license": "ISC",
+  "author": "palak banik",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
