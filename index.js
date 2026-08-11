@@ -16,9 +16,9 @@ const app = {};
 
 // testing file system
 // @todo: clean after test
-data.delete("test", "newFile", (err) => {
-    console.log(err);
-});
+// data.delete("test", "newFile", (err) => {
+//     console.log(err);
+// });
 
 // handle Request & Response
 app.handleReqRes = handleReqRes;
