@@ -14,11 +14,11 @@ const utilities = {};
 
 // parse JSON string to Object
 utilities.parseJSON = (jsonString) => {
-    let output;
+    let output = {};
 
     try {
-        output = JSON.stringify(jsonString);
-    } catch {
+        output = JSON.parse(jsonString);
+    } catch (err) {
         output = {};
     }
 

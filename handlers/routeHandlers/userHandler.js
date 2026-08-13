@@ -8,6 +8,7 @@
 // dependencies
 const data = require("../../lib/data");
 const { hash } = require("../../helpers/utilities");
+const { parseJSON } = require("../../helpers/utilities");
 
 // module scaffolding
 const handler = {};
@@ -90,11 +91,127 @@ handler._user.post = (requestProperties, callback) => {
 };
 
 handler._user.get = (requestProperties, callback) => {
-    callback(200);
+    const phone =
+        typeof requestProperties.queryStringObject.phone === "string" &&
+        requestProperties.queryStringObject.phone.trim().length === 11
+            ? requestProperties.queryStringObject.phone
+            : null;
+
+    if (phone) {
+        data.read("users", phone, (err, userInfo) => {
+            const user = { ...parseJSON(userInfo) };
+
+            if (!err && user) {
+                delete user.password;
+                callback(200, user);
+            } else {
+                callback(404, {
+                    error: "Requested user was not found!",
+                });
+            }
+        });
+    } else {
+        callback(404, {
+            error: "Requested user was not found!",
+        });
+    }
 };
 
-handler._user.put = (requestProperties, callback) => {};
+handler._user.put = (requestProperties, callback) => {
+    const firstName =
+        typeof requestProperties.body.firstName === "string" &&
+        requestProperties.body.firstName.trim().length > 0
+            ? requestProperties.body.firstName
+            : null;
 
-handler._user.delete = (requestProperties, callback) => {};
+    const lastName =
+        typeof requestProperties.body.lastName === "string" &&
+        requestProperties.body.lastName.trim().length > 0
+            ? requestProperties.body.lastName
+            : null;
+
+    const phone =
+        typeof requestProperties.body.phone === "string" &&
+        requestProperties.body.phone.trim().length === 11
+            ? requestProperties.body.phone
+            : null;
+
+    const password =
+        typeof requestProperties.body.password === "string" &&
+        requestProperties.body.password.trim().length > 0
+            ? requestProperties.body.password
+            : null;
+
+    if (phone) {
+        if (firstName || lastName || password) {
+            data.read("users", phone, (err1, userData) => {
+                const user = { ...parseJSON(userData) };
+                // look up the user info
+                if (!err1 && user) {
+                    if (firstName) {
+                        user.firstName = firstName;
+                    }
+                    if (lastName) {
+                        user.lastName = lastName;
+                    }
+                    if (password) {
+                        user.password = hash(password);
+                    }
+                }
+
+                // update to the database
+                data.update("users", phone, user, (err2) => {
+                    if (!err2) {
+                        callback(200, {
+                            message: "User was updated successfully.",
+                        });
+                    } else {
+                        callback(500, {
+                            error: "There was a problem in server side.",
+                        });
+                    }
+                });
+            });
+        } else {
+            callback(400, {
+                error: "You have a problem in your request!",
+            });
+        }
+    } else {
+        callback(400, {
+            error: "You have a problem in your request!",
+        });
+    }
+};
+
+handler._user.delete = (requestProperties, callback) => {
+    const phone =
+        typeof requestProperties.queryStringObject.phone === "string" &&
+        requestProperties.queryStringObject.phone.trim().length === 11
+            ? requestProperties.queryStringObject.phone
+            : null;
+
+    if (phone) {
+        data.read("users", phone, (err1, userData) => {
+            if (!err1 && userData) {
+                data.delete("users", phone, (err2) => {
+                    if (!err2) {
+                        callback(200, {
+                            message: "User was successfully deleted.",
+                        });
+                    } else {
+                        callback(500, {
+                            error: "There was a server side error!",
+                        });
+                    }
+                });
+            } else {
+                callback(500, {
+                    error: "There was a server side error!",
+                });
+            }
+        });
+    }
+};
 
 module.exports = handler;
